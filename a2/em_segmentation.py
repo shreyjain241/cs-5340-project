@@ -84,7 +84,6 @@ def pre_process(data):
 	processed_data = np.zeros(shape=data.shape)
 	for i in range(data.shape[1]):
 		processed_data[:,i] = (data[:,i] - np.mean(data[:,i]))/np.std(data[:,i])
-	#processed_data = np.delete(processed_data,2,axis=1)
 	return processed_data
 
 
@@ -116,7 +115,6 @@ def segment_image(data):
 	return mask_image, foreground, background
 
 if __name__=='__main__':
-	#values = ['cow']
 	values = ['fox','owl','zebra','cow']
 	for i in values:
 		print ("Now Processing : " + str(i) + ".txt")

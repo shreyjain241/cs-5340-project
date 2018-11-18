@@ -5,6 +5,15 @@ from scipy.stats import norm
 
 
 def run_gibbs_sampling(X,params):
+	'''
+	This function runs the gibbs sampling algorithm on the data input X and returns all iterations
+	Input:
+	'X' is a numpy array of size (image_width, image_height) with all values either 1 or -1
+	'params' is a dict containing values for coupling_strength, sigma, and iterations
+
+	Output:
+	Returns the result of each iteration of the sampling in a numpy matrix of size (image_width, image_height, iterations)
+	'''
 	n_iters = params['iterations']
 	sigma = params['sigma']
 	J = params['coupling_strength']
@@ -12,9 +21,6 @@ def run_gibbs_sampling(X,params):
 
 	prob_equal = norm.pdf(1,1,sigma)/(norm.pdf(1,1,sigma) + norm.pdf(-1,1,sigma))
 	prob_unequal = norm.pdf(-1,1,sigma)/(norm.pdf(1,1,sigma) + norm.pdf(-1,1,sigma))
-
-	#cdf_unequal = norm.cdf(0,1,sigma)
-	#cdf_equal = norm.cdf(0,-1,sigma)
 
 	X0 = X
 	samples[:,:,0] = X0
@@ -45,6 +51,7 @@ def run_gibbs_sampling(X,params):
 	return samples
 
 def get_mrf(data):
+	# function to convert raw image data into a numpy matrix of size (image_width, image_height) and values 1 and -1.
 	rows = max(data[:,0].astype(int)) + 1
 	cols = max(data[:,1].astype(int)) + 1
 	X = data[:,2].astype(int).reshape(rows,cols)
@@ -52,7 +59,7 @@ def get_mrf(data):
 	return X
 
 def mrf_to_txt(data):
-
+	# function to convert the mrf numpy matrix into the format of the orginal image.
 	txt_data = np.zeros((data.shape[0]*data.shape[1],3,data.shape[2]))
 	for k in range(data.shape[2]):
 		n = 0
@@ -85,7 +92,12 @@ if __name__=='__main__':
 		data, image = read_data(filename, is_RGB = True)
 		denoised_data = denoise_data(data)
 		for j in range(denoised_data.shape[2]):
-			output_filename = "gibbs_denoising_results" + os.sep + str(i) + "_denoise_iter{:d}.txt".format(j)
-			write_data(denoised_data[:,:,j], output_filename)
-			data, image = read_data(output_filename, is_RGB=True, save=True)
+			if j == 0:
+				output_filename = "gibbs_denoising_results" + os.sep + str(i) + "_original.txt"
+				write_data(denoised_data[:,:,j], output_filename)
+				data, image = read_data(output_filename, is_RGB=True, save=True)
+			else:
+				output_filename = "gibbs_denoising_results" + os.sep + str(i) + "_denoise_iter{:d}.txt".format(j)
+				write_data(denoised_data[:,:,j], output_filename)
+				data, image = read_data(output_filename, is_RGB=True, save=True)
 

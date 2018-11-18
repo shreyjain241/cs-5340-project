@@ -6,6 +6,15 @@ from scipy.special import expit
 
 
 def run_variational_inference(X,params):
+	'''
+	This function runs the variational inference algorithm on the data input X and returns all iterations
+	Input:
+	'X' is a numpy array of size (image_width, image_height) with all values either 1 or -1
+	'params' is a dict containing values for coupling_strength, c, and iterations
+
+	Output:
+	Returns the result of each iteration of the sampling in a numpy matrix of size (image_width, image_height, iterations)
+	'''
 	J = params['coupling_strength']
 	c = params['c']
 	n_iters = params['iterations']
@@ -38,6 +47,7 @@ def run_variational_inference(X,params):
 	return processed_data
 
 def get_mrf(data):
+	# function to convert raw image data into a numpy matrix of size (image_width, image_height) and values 1 and -1.
 	rows = max(data[:,0].astype(int)) + 1
 	cols = max(data[:,1].astype(int)) + 1
 	X = data[:,2].astype(int).reshape(rows,cols)
@@ -45,7 +55,7 @@ def get_mrf(data):
 	return X
 
 def mrf_to_txt(data):
-
+	# function to convert the mrf numpy matrix into the format of the orginal image.
 	txt_data = np.zeros((data.shape[0]*data.shape[1],3,data.shape[2]))
 	for k in range(data.shape[2]):
 		n = 0
@@ -75,6 +85,11 @@ if __name__=='__main__':
 		data, image = read_data(filename, is_RGB = True)
 		denoised_data = denoise_data(data)
 		for j in range(denoised_data.shape[2]):
-			output_filename = "variational_inference_denoising_results" + os.sep + str(i) + "_denoise_iter{:d}.txt".format(j)
-			write_data(denoised_data[:,:,j], output_filename)
-			data, image = read_data(output_filename, is_RGB=True, save=True)
+			if j == 0:
+				output_filename = "variational_inference_denoising_results" + os.sep + str(i) + "_original.txt"
+				write_data(denoised_data[:,:,j], output_filename)
+				data, image = read_data(output_filename, is_RGB=True, save=True)
+			else:
+				output_filename = "variational_inference_denoising_results" + os.sep + str(i) + "_denoise_iter{:d}.txt".format(j)
+				write_data(denoised_data[:,:,j], output_filename)
+				data, image = read_data(output_filename, is_RGB=True, save=True)			

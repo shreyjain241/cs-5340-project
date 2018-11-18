@@ -2,7 +2,6 @@ from io_data import read_data, write_data
 import os
 import numpy as np
 from scipy.stats import multivariate_normal
-from sklearn.mixture import GaussianMixture
 np.random.seed(5)
 
 def run_em_algorithm(X, min_em_iterations):
@@ -50,8 +49,10 @@ def run_em_algorithm(X, min_em_iterations):
 	np.fill_diagonal(covariances[0,:,:],1)
 	np.fill_diagonal(covariances[1,:,:],1)
 
-	# Gamma and mixing co-efficients both intialised to zero
+	# Gamma intialised to zero
 	gamma = np.zeros(shape=(N,2))
+
+	#Mixing coefficients initialised to 0.5 each
 	mixers = np.array([0.5,0.5])
 
 	denominator = multivariate_normal.pdf(X,means[0,:],covariances[0,:,:]) + multivariate_normal.pdf(X,means[1,:],covariances[1,:,:])

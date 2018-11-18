@@ -7,6 +7,29 @@ np.random.seed(5)
 
 def run_em_algorithm(X, min_em_iterations):
 
+	'''
+	This function runs the EM algorithm on the image to find 2 segments and returns the mask.
+
+	Input: 
+	'X' is the numpy array representing the pre-processed (standardized) image of size (N,M), where
+	N = number of pixels
+	M = number of features. 
+	The features used are (x, y, L, a, b) which are standardised beforehand (subtract the mean, divide by standard deviation)
+	
+	'min_em_iterations' is the minimum number of iterations that the EM algorithm will run for even if it converges.
+
+	Output:
+	'mask' - an array of size M which contains values either 0 or 1 representing the segment. 
+	'''
+
+
+	#EM initialisation is of utmost importance to prevent convergence to local maxima
+	'''
+	initialise the means in the following manner:
+	1) Segment the image into 2 'windows', the center of the image and the background. Refer to report for the specifics.
+	2) take the mean of the (x,y,L,a,b) values as the initial mean. 
+
+	'''
 	N, M = X.shape[0], X.shape[1]
 	half_range = max(X[:,0])/2
 	X0 = list()
@@ -22,10 +45,12 @@ def run_em_algorithm(X, min_em_iterations):
 	means[0,:] = np.mean(X0, axis=0)
 	means[1,:] = np.mean(X1, axis=0)
 
+	#Initialise the covariances to be diagonal matrices with unit values
 	covariances = np.zeros(shape=(2,M,M))
 	np.fill_diagonal(covariances[0,:,:],1)
 	np.fill_diagonal(covariances[1,:,:],1)
 
+	# Gamma and mixing co-efficients both intialised to zero
 	gamma = np.zeros(shape=(N,2))
 	mixers = np.array([0.5,0.5])
 
@@ -80,6 +105,7 @@ def run_em_algorithm(X, min_em_iterations):
 
 
 def pre_process(data):
+	# Standardize the data. Subtract the mean and divide by standard deviation
 
 	processed_data = np.zeros(shape=data.shape)
 	for i in range(data.shape[1]):
